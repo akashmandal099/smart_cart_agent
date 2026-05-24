@@ -1,0 +1,56 @@
+[project]
+name = "smartcart-backend"
+version = "1.0.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi==0.115.12",
+    "uvicorn[standard]==0.30.0",
+    "pydantic==2.9.2",
+    "pydantic-settings==2.5.2",
+    "langchain==0.3.25",
+    "langchain-core==0.3.60",
+    "langgraph==0.2.73",
+    "langchain-openai==0.3.17",
+    "langchain-ollama==0.3.3",
+    "playwright==1.45.0",
+    "beautifulsoup4==4.12.3",
+    "lxml==5.2.2",
+    "cachetools==5.3.3",
+    "httpx==0.27.0",
+    "requests==2.32.3",
+    "streamlit==1.45.1",
+    "gradio==5.31.0",
+    "python-dotenv==1.0.1",
+]
+
+[project.scripts]
+smartcart = "backend.main:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.27.0",
+    "ruff>=0.4.0",
+    "mypy>=1.10.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["backend"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+strict = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
