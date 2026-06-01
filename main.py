@@ -6,41 +6,6 @@ Run:
     or
     uvicorn  main:app --reload --port 8000
 """
-# import uvicorn
-# from fastapi import FastAPI
-# from fastapi.middleware.cors import CORSMiddleware
-
-# from api.routes import router
-# from config.settings import get_settings
-
-# _s = get_settings()
-
-# app = FastAPI(
-#     title="SmartCart AI",
-#     description="AI-powered product price comparison with offer intelligence for Amazon & Flipkart India.",
-#     version="1.0.0",
-# )
-
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=_s.cors_origins,
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
-
-# app.include_router(router)
-
-
-# if __name__ == "__main__":
-#     uvicorn.run(
-#         " main:app",
-#         host=_s.app_host,
-#         port=_s.app_port,
-#         reload=True,
-#     )
-
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config import get_settings
@@ -70,3 +35,26 @@ async def root():
 # ── Include your API router ────────────────────────────────────────────────
 from api.routes import router
 app.include_router(router)
+
+# # quick test for debugging for flipkart scraper
+# if __name__ == "__main__":
+#     import asyncio
+#     # from scrapers.amazon import AmazonScraper
+#     from scrapers.flipkart import FlipkartScraper
+
+#     async def test():
+#         # scraper = AmazonScraper()
+#         scraper = FlipkartScraper()
+#         products = await scraper.search_products(
+#             query="mobile phones",
+#             price_min=16000,
+#             price_max=25000,
+#             max_results=1,
+#         )
+#         for p in products:
+#             print(p)
+#             offers = await scraper.scrape_offers(p)
+#             for o in offers:
+#                 print(" Offer ==> ", o)
+
+#     asyncio.run(test())

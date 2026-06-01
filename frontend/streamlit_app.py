@@ -25,7 +25,7 @@ def init_state() -> None:
 
 
 def api_post(path: str, payload: dict):
-    return requests.post(f"{API_BASE}{path}", json=payload, timeout=180)
+    return requests.post(f"{API_BASE}{path}", json=payload, timeout=1800)
 
 
 def render_sidebar() -> None:

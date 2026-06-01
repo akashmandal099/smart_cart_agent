@@ -27,7 +27,8 @@ class Settings(BaseSettings):
     scraper_min_delay_ms: int = 5000
     scraper_max_delay_ms: int = 7500
     scraper_timeout_ms: int = 30000
-    scraper_max_per_platform: int = 20
+    scraper_max_per_platform: int = 5
+    scraper_max_offers_per_platform_per_product: int = 3
     scraper_headless: bool = True
 
     # ── App ───────────────────────────────────────────────────────────────────

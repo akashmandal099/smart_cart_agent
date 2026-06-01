@@ -1,0 +1,52 @@
+# === Python & Environment ===
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+
+# === Package Manager (uv / pip / poetry) ===
+# uv handles .venv and caches automatically
+.uv/
+.cache/
+# Keep uv.lock in version control for reproducible builds. 
+# Uncomment below only if you are building a library, not an application.
+# uv.lock
+
+# === Agentic AI & LLM Frameworks (LangChain, CrewAI, AutoGen, etc.) ===
+# Local Vector Databases & Embeddings
+.chroma/
+.duckdb/
+*.db
+*.sqlite
+*.index
+data/vector_store/
+
+# AI Agent Telemetry & Observability (Phoenix, LangSmith local caches)
+.phoenix/
+.langchain/
+*.log
+agent_run_*.json
+
+# Large AI Assets
+*.bin
+*.onnx
+*.pkl
+*.pickle
+models/
+downloads/
+
+# === Environment Secrets (CRITICAL for API Keys) ===
+.env
+.env.*
+!.env.example
+secrets.toml
+*.pem
+*.key
+
+# === IDEs & System Files ===
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+

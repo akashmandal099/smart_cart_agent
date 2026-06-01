@@ -1,71 +1,78 @@
-"""Shared scraper utilities: user-agents, delays, safe DOM helpers, price parser."""
+"""
+Shared scraper utilities — parse_price, random_delay, random_ua,
+safe_text / safe_attr helpers for Playwright element handles.
+"""
+from __future__ import annotations
+
 import asyncio
 import random
 import re
+from typing import Optional
 
-from playwright.async_api import Page
-from  config.settings import get_settings
+from playwright.async_api import ElementHandle
+
+from config.settings import get_settings
 
 _s = get_settings()
 
-USER_AGENTS: list[str] = [
-    (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/124.0.0.0 Safari/537.36"
-    ),
-    (
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/123.0.0.0 Safari/537.36"
-    ),
-    (
-        "Mozilla/5.0 (X11; Linux x86_64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/122.0.0.0 Safari/537.36"
-    ),
+# ── User-agent pool ───────────────────────────────────────────────────────────
+_USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) "
+    "Gecko/20100101 Firefox/125.0",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/605.1.15 "
+    "(KHTML, like Gecko) Version/17.4.1 Safari/605.1.15",
 ]
 
 
 def random_ua() -> str:
-    return random.choice(USER_AGENTS)
+    return random.choice(_USER_AGENTS)
 
 
 async def random_delay() -> None:
-    """Randomised pause between requests — basic anti-bot measure."""
+    """Human-like delay between scraper actions."""
     ms = random.randint(_s.scraper_min_delay_ms, _s.scraper_max_delay_ms)
-    await asyncio.sleep(ms / 1000.0)
+    await asyncio.sleep(ms / 1000)
 
 
-async def safe_text(page: Page, selector: str, default: str = "") -> str:
-    """Return inner text of first matching element, or default on any error."""
+# ── Price parser ─────────────────────────────────────────────────────────────
+
+def parse_price(text: Optional[str]) -> float:
+    """Extract a numeric price from a string like '₹20,999' or '20999'."""
+    if not text:
+        return 0.0
+    cleaned = re.sub(r"[^\d.]", "", text.replace(",", ""))
     try:
-        el = await page.query_selector(selector)
-        return (await el.inner_text()).strip() if el else default
-    except Exception:
-        return default
-
-
-async def safe_attr(page: Page, selector: str, attr: str, default: str = "") -> str:
-    """Return attribute value of first matching element, or default."""
-    try:
-        el = await page.query_selector(selector)
-        if el:
-            val = await el.get_attribute(attr)
-            return (val or default).strip()
-        return default
-    except Exception:
-        return default
-
-
-def parse_price(text: str) -> float:
-    """
-    Extract a numeric price from strings like:
-      '₹22,999', '22,999.00', '₹ 1,09,990', 'MRP: ₹45000'
-    Returns 0.0 if no valid number found.
-    """
-    cleaned = re.sub(r"[^\d.]", "", text)
-    try:
-        return float(cleaned) if cleaned else 0.0
+        return float(cleaned)
     except ValueError:
         return 0.0
+
+
+# ── Playwright helpers ────────────────────────────────────────────────────────
+
+async def safe_text(handle: ElementHandle, selector: str) -> str:
+    """Query selector inside handle and return inner text, or '' on failure."""
+    try:
+        el = await handle.query_selector(selector)
+        if el:
+            return (await el.inner_text()).strip()
+    except Exception:
+        pass
+    return ""
+
+
+async def safe_attr(handle: ElementHandle, selector: str, attr: str) -> str:
+    """Query selector inside handle and return attribute value, or '' on failure."""
+    try:
+        el = await handle.query_selector(selector)
+        if el:
+            val = await el.get_attribute(attr)
+            return (val or "").strip()
+    except Exception:
+        pass
+    return ""

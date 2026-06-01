@@ -100,6 +100,7 @@ async def tc_parser_node(state: AgentState) -> AgentState:
         updated: list[Offer] = []
 
         for p in parsed_list:
+            print ("Parsed offer: ", p)
             oid = p.get("offer_id", "")
             base = offer_map.get(oid)
             if not base:

@@ -24,19 +24,19 @@ _llm = get_llm(temperature=0.0, json_mode=True)
 _SYSTEM = """You are a shopping intent parser for Indian e-commerce (Amazon India, Flipkart).
 Extract a JSON object with exactly these keys:
 
-  query_type  : "category" or "specific_product"
+  query_type  : "category" or "specific_product" — category if user is looking for a type of product (e.g. "mobile phones under 20K"), specific_product if they mention a specific product with exact product name (e.g. "iPhone 15 offers")
   product     : string — best search query to use (e.g. "mobile phone", "Samsung Galaxy M35 5G")
   brand_hint  : string or null — e.g. "Samsung", "Boat"
-  price_min   : number — 0 if not mentioned price_min or price_max, otherwise take 20% less than price_max (e.g. "around 20K" → price_max=20000, price_min=16000)
-  price_max   : number — 99999999 if not mentioned price_max or price_min, otherwise take 20% more than price_min (e.g. "between 20K-25K" → price_min=20000, price_max=25000)
+  price_min   : number — 0 if not mentioned price_min and price_max, otherwise 20% less than price_max (e.g. "under 20K" → price_max=20000, price_min=20000*0.8=16000)
+  price_max   : number — 99999999 if not mentioned price_max and price_min, otherwise 20% more than price_min (e.g. "above 20K" → price_min=20000, price_max=20000*1.2=24000)
   platforms   : list from ["amazon","flipkart"] — both if not specified
   top_n       : number — default 10
 
 Conversion rules:
   "1 lakh" = 100000 | "1k" / "1K" = 1000 | "20K" / "20k" = 20000
-  "under ₹25K"       → price_min=0,     price_max=25000
+  "under ₹25K"       → price_min=(25000*0.8)=20000,     price_max=25000
   "between 20K-25K"  → price_min=20000, price_max=25000
-  "around 20K"       → price_min=17000, price_max=23000
+  "around 20K"       → price_min=(20000*0.8)=16000, price_max=(20000*1.2)=24000
 
 Follow-up rules (use conversation history):
   "show only Samsung"   → same query, brand_hint="Samsung"
@@ -68,7 +68,7 @@ async def intent_parser_node(state: AgentState) -> AgentState:
         product=raw.get("product", state["user_message"]),
         brand_hint=raw.get("brand_hint"),
         price_min=float(raw.get("price_min", 0)),
-        price_max=float(raw.get("price_max", 99_999_999)),
+        price_max=float(raw.get("price_max", 99_999_9)),
         platforms=[Platform(p) for p in raw.get("platforms", ["amazon", "flipkart"])],
         top_n=int(raw.get("top_n", 10)),
     )

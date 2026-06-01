@@ -1,35 +1,58 @@
 [project]
 name = "smartcart-backend"
 version = "1.0.0"
+description = "AI-powered product price comparison with offer intelligence for Amazon & Flipkart India."
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "fastapi==0.115.12",
+    # ── Web framework ──────────────────────────────────────────────────────────
+    "fastapi==0.115.0",
     "uvicorn[standard]==0.30.0",
+
+    # ── Data validation ────────────────────────────────────────────────────────
+    # pydantic >=2.9 required by langchain-ollama==0.3.3
     "pydantic==2.9.2",
     "pydantic-settings==2.5.2",
+
+    # ── LangChain / LangGraph  (pinned as tested compatible set) ──────────────
     "langchain==0.3.25",
     "langchain-core==0.3.60",
     "langgraph==0.2.73",
     "langchain-openai==0.3.17",
     "langchain-ollama==0.3.3",
+
+    # ── Scraping ──────────────────────────────────────────────────────────────
     "playwright==1.45.0",
+    # lxml is the fast BeautifulSoup parser — must be listed explicitly when
+    # using soup = BeautifulSoup(html, "lxml")
     "beautifulsoup4==4.12.3",
     "lxml==5.2.2",
+
+    # ── Cache ─────────────────────────────────────────────────────────────────
     "cachetools==5.3.3",
+
+    # ── HTTP client (used by Amazon PA API calls) ──────────────────────────────
     "httpx==0.27.0",
     "requests==2.32.3",
-    "streamlit==1.45.1",
-    "gradio==5.31.0",
+
+    # ── Config / env ──────────────────────────────────────────────────────────
     "python-dotenv==1.0.1",
+
+    # ── Frontend ──────────────────────────────────────────────────────────────
+    "streamlit==1.45.1",
 ]
 
 [project.scripts]
-smartcart = "backend.main:app"
+smartcart = "smartcart_backend.main:app"
 
+# ── Build ─────────────────────────────────────────────────────────────────────
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.build.targets.wheel]
+packages = ["smartcart_backend"]
+
+# ── Dev extras ────────────────────────────────────────────────────────────────
 [dependency-groups]
 dev = [
     "pytest>=8.0.0",
@@ -39,18 +62,25 @@ dev = [
     "mypy>=1.10.0",
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = ["backend"]
-
+# ── Linter ────────────────────────────────────────────────────────────────────
 [tool.ruff]
 line-length = 100
 target-version = "py312"
 
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = ["E501"]
+
+# ── Type-checker ──────────────────────────────────────────────────────────────
 [tool.mypy]
 python_version = "3.12"
 ignore_missing_imports = true
 strict = false
 
+# ── Test runner ───────────────────────────────────────────────────────────────
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+markers = [
+    "integration: tests that call real external services including LLMs",
+]
