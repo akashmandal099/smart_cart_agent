@@ -39,10 +39,11 @@ dependencies = [
 
     # ── Frontend ──────────────────────────────────────────────────────────────
     "streamlit==1.45.1",
+    "nest_asyncio>=1.6.0",
 ]
 
 [project.scripts]
-smartcart = "smartcart_backend.main:app"
+smartcart = "main:app"
 
 # ── Build ─────────────────────────────────────────────────────────────────────
 [build-system]
