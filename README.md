@@ -45,14 +45,6 @@ make test          # pytest
 make clean         # remove .venv, caches
 ```
 
-## Adding a new dependency
-
-```bash
-uv add <package>             # adds to [project.dependencies]
-uv add --dev <package>       # adds to [tool.uv.dev-dependencies]
-uv remove <package>          # removes a dependency
-```
-
 ## Project Structure
 
 ```
@@ -70,3 +62,11 @@ backend/
 ├── api/                  FastAPI routes
 └── utils/                shared helpers
 ```
+
+## Sample chat output document
+
+[Click here to view the Documentation](data/SmartCart_AI_example_result.pdf)
+
+## Detailed technical document
+
+[Click here to view the Documentation](docs/smartcart_design_doc.md)
